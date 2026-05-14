@@ -142,6 +142,25 @@ def calculate_penalty(violation_type: str, severity: str, annual_revenue: float)
 
 
 @tool
+def search_case_law(keywords: str) -> str:
+    """Tìm kiếm án lệ theo từ khóa.
+
+    Args:
+        keywords: Từ khóa tìm kiếm (e.g., 'breach', 'negligence', 'contract').
+    """
+    cases = {
+        "breach": "Hadley v. Baxendale (1854) - Consequential damages for breach of contract",
+        "negligence": "Donoghue v. Stevenson (1932) - Duty of care and neighbour principle",
+        "contract": "Carlill v. Carbolic Smoke Ball Co (1893) - Unilateral contract formation",
+    }
+    kw = keywords.lower()
+    for key, case in cases.items():
+        if key in kw:
+            return case
+    return "Không tìm thấy án lệ phù hợp"
+
+
+@tool
 def check_compliance_requirements(industry: str, company_size: str) -> str:
     """Check which regulatory compliance frameworks apply to a company.
 
@@ -172,7 +191,7 @@ def check_compliance_requirements(industry: str, company_size: str) -> str:
     )
 
 
-TOOLS = [search_legal_database, calculate_penalty, check_compliance_requirements]
+TOOLS = [search_legal_database, calculate_penalty, check_compliance_requirements, search_case_law]
 
 QUESTION = (
     "A tech startup with $5M revenue was caught sharing user data without consent "
@@ -205,7 +224,7 @@ async def main():
     print("-" * 70)
 
     llm = get_llm()
-    graph = create_react_agent(model=llm, tools=TOOLS, prompt=SYSTEM_PROMPT)
+    graph = create_react_agent(model=llm, tools=TOOLS, prompt=SYSTEM_PROMPT, debug=True)
 
     inputs = {"messages": [{"role": "user", "content": QUESTION}]}
 
